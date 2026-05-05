@@ -34,10 +34,17 @@ Expected result:
 
 ## Publish checklist
 
-- [ ] Create GitHub org or repo location.
-- [ ] Initialize git repository.
-- [ ] Commit v0.0.1 skeleton.
-- [ ] Push to GitHub.
-- [ ] Create tag `v0.0.1`.
-- [ ] Add repo link to content plan.
+- [x] Create GitHub org or repo location.
+- [x] Initialize git repository.
+- [x] Commit v0.0.1 skeleton.
+- [x] Push to GitHub.
+- [x] Create tag `v0.0.1`.
+- [x] Add repo link to content plan.
 - [ ] Record first demo video script.
+
+## Public links
+
+```text
+Repository: https://github.com/paopaonyapi-creator/nami-harness
+Release: https://github.com/paopaonyapi-creator/nami-harness/releases/tag/v0.0.1
+```
