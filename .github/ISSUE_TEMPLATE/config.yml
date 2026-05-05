@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Nami Harness discussions
+    url: https://github.com/paopaonyapi-creator/nami-harness/issues
+    about: Use issues for scoped bug reports, feature requests, and roadmap discussion.
