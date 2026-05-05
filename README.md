@@ -33,6 +33,7 @@ pytest
 - **Release `v0.0.1`**: <https://github.com/paopaonyapi-creator/nami-harness/releases/tag/v0.0.1>
 - **Roadmap**: [`ROADMAP.md`](ROADMAP.md)
 - **Demo video script**: [`docs/demo-video-01-script.md`](docs/demo-video-01-script.md)
+- **Sensor event schema**: [`docs/sensor-event-schema.md`](docs/sensor-event-schema.md)
 
 ## Minimal example
 
@@ -58,4 +59,4 @@ print(result.output)
 
 ## Status
 
-Version `0.0.1` is the first open-source skeleton for the Harness Engineering pillar. The next planned line is `v0.1`, focused on rate limits, budget guards, stable sensor schema, and a fuller Hermes integration demo.
+Version `0.0.1` is the first open-source skeleton for the Harness Engineering pillar. The current `master` branch includes early `v0.1` work for rate limits, budget guards, stable sensor schema, and a fuller Hermes integration demo.

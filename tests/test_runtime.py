@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from nami_harness.brakes import CircuitBreaker, FileKillSwitch
+from nami_harness.brakes import BudgetGuard, CircuitBreaker, FileKillSwitch
 from nami_harness.exceptions import BrakeEngaged, QualityGateFailed, RailDenied
 from nami_harness.quality import QualityGate, forbid_terms, require_non_empty
 from nami_harness.rails import RailPolicy
@@ -70,3 +70,56 @@ def test_runtime_records_failure_and_opens_circuit_breaker(tmp_path) -> None:
     records = [json.loads(line) for line in (tmp_path / "events.jsonl").read_text(encoding="utf-8").splitlines()]
     assert records[-1]["event_type"] == "harness.task.failed"
     assert records[-1]["payload"]["error_type"] == "QualityGateFailed"
+
+
+def test_runtime_records_stable_sensor_schema(tmp_path) -> None:
+    runtime = HarnessRuntime(
+        rails=RailPolicy(allowed_agents={"hermes"}, allowed_actions={"summarize"}),
+        quality=QualityGate([require_non_empty("answer")]),
+        sensor=JsonlSensor(tmp_path / "events.jsonl"),
+    )
+
+    runtime.run(
+        HarnessContext(agent="hermes", action="summarize", correlation_id="trace-1"),
+        {"input": "hello"},
+        lambda payload: {"answer": payload["input"]},
+    )
+
+    records = [json.loads(line) for line in (tmp_path / "events.jsonl").read_text(encoding="utf-8").splitlines()]
+    assert records[-1]["schema_version"] == "1.0"
+    assert records[-1]["status"] == "success"
+    assert records[-1]["agent"] == "hermes"
+    assert records[-1]["action"] == "summarize"
+    assert records[-1]["correlation_id"] == "trace-1"
+
+
+def test_runtime_stops_when_budget_guard_would_exceed_budget() -> None:
+    runtime = HarnessRuntime(
+        rails=RailPolicy(),
+        quality=QualityGate([require_non_empty("answer")]),
+        budget_guard=BudgetGuard(max_cost=0.1),
+    )
+
+    with pytest.raises(BrakeEngaged):
+        runtime.run(
+            HarnessContext(agent="hermes", action="summarize", estimated_cost=0.2),
+            {},
+            lambda payload: {"answer": "ok"},
+        )
+
+
+def test_runtime_records_budget_spend_after_success() -> None:
+    guard = BudgetGuard(max_cost=1.0)
+    runtime = HarnessRuntime(
+        rails=RailPolicy(),
+        quality=QualityGate([require_non_empty("answer")]),
+        budget_guard=guard,
+    )
+
+    runtime.run(
+        HarnessContext(agent="hermes", action="summarize", estimated_cost=0.2),
+        {},
+        lambda payload: {"answer": "ok"},
+    )
+
+    assert guard.spent == 0.2

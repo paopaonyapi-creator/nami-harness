@@ -1,6 +1,6 @@
 [project]
 name = "nami-harness"
-version = "0.0.1"
+version = "0.1.0"
 description = "Harness engineering primitives for agentic systems: rails, brakes, sensors, and quality gates."
 readme = "README.md"
 requires-python = ">=3.10"

@@ -1,6 +1,6 @@
 import pytest
 
-from nami_harness.brakes import CircuitBreaker, FileKillSwitch
+from nami_harness.brakes import BudgetGuard, CircuitBreaker, FileKillSwitch
 from nami_harness.exceptions import BrakeEngaged
 
 
@@ -28,3 +28,19 @@ def test_circuit_breaker_opens_after_threshold() -> None:
 
     with pytest.raises(BrakeEngaged):
         breaker.assert_closed()
+
+
+def test_budget_guard_allows_spend_inside_budget() -> None:
+    guard = BudgetGuard(max_cost=1.0)
+
+    guard.assert_within_budget(0.4)
+    guard.record_spend(0.4)
+
+    assert guard.remaining() == 0.6
+
+
+def test_budget_guard_stops_when_estimated_cost_exceeds_budget() -> None:
+    guard = BudgetGuard(max_cost=1.0, spent=0.8)
+
+    with pytest.raises(BrakeEngaged):
+        guard.assert_within_budget(0.3)
